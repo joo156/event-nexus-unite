@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 import HeroSection from "@/components/common/HeroSection";
-import { Link } from "react-router-dom";
+import { User, Mail, Phone, Key } from "lucide-react";
 
 const formSchema = z.object({
-  fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
+  name: z.string().min(2, { message: "Full name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
   phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
@@ -26,12 +26,19 @@ const formSchema = z.object({
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { register, isAuthenticated } = useAuth();
+  
+  // If already logged in, redirect
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: "",
+      name: "",
       email: "",
       phoneNumber: "",
       password: "",
@@ -39,26 +46,25 @@ const SignUp = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     
-    // Mock registration - in a real app, this would send data to a backend
-    setTimeout(() => {
-      // Store user in localStorage (for demo purposes)
-      localStorage.setItem("authUser", JSON.stringify({
-        name: values.fullName,
+    try {
+      const success = await register({
+        name: values.name,
         email: values.email,
         role: "user",
-      }));
-      
-      toast({
-        title: "Registration successful!",
-        description: "Welcome to eventNexus. Your account has been created.",
+        password: values.password
       });
       
-      navigate("/");
+      if (success) {
+        navigate('/');
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -69,17 +75,24 @@ const SignUp = () => {
       />
       
       <div className="container mx-auto py-12 max-w-md">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="glass-card p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
                 control={form.control}
-                name="fullName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel className="text-gray-300">Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John Doe" {...field} />
+                      <div className="relative">
+                        <Input 
+                          placeholder="John Doe" 
+                          className="dark-input pl-10" 
+                          {...field} 
+                        />
+                        <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -91,9 +104,16 @@ const SignUp = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-gray-300">Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="your@email.com" {...field} />
+                      <div className="relative">
+                        <Input 
+                          placeholder="your@email.com" 
+                          className="dark-input pl-10" 
+                          {...field} 
+                        />
+                        <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -105,9 +125,16 @@ const SignUp = () => {
                 name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel className="text-gray-300">Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="+1 (555) 123-4567" {...field} />
+                      <div className="relative">
+                        <Input 
+                          placeholder="+1 (555) 123-4567" 
+                          className="dark-input pl-10" 
+                          {...field} 
+                        />
+                        <Phone className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -119,9 +146,17 @@ const SignUp = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel className="text-gray-300">Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <div className="relative">
+                        <Input 
+                          type="password" 
+                          placeholder="••••••••" 
+                          className="dark-input pl-10" 
+                          {...field} 
+                        />
+                        <Key className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -133,9 +168,17 @@ const SignUp = () => {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel className="text-gray-300">Confirm Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <div className="relative">
+                        <Input 
+                          type="password" 
+                          placeholder="••••••••" 
+                          className="dark-input pl-10" 
+                          {...field} 
+                        />
+                        <Key className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -144,14 +187,14 @@ const SignUp = () => {
               
               <Button 
                 type="submit" 
-                className="w-full bg-eventPrimary hover:bg-eventSecondary"
+                className="w-full bg-eventPrimary hover:bg-eventSecondary btn-animated"
                 disabled={isLoading}
               >
                 {isLoading ? "Creating Account..." : "Sign Up"}
               </Button>
               
               <div className="text-center mt-4">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-400">
                   Already have an account?{" "}
                   <Link to="/signin" className="text-eventPrimary hover:underline">
                     Sign in

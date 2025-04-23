@@ -7,81 +7,58 @@
 
 @layer base {
   :root {
-    --background: 260 33% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
 
     --primary: 252 83% 75%;
-    --primary-foreground: 210 40% 98%;
+    --primary-foreground: 240 5.9% 10%;
 
-    --secondary: 240 25% 14%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
 
     --accent: 270 100% 92%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent-foreground: 240 5.9% 10%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
     --ring: 252 83% 75%;
 
     --radius: 0.5rem;
-  }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 252 83% 75%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 270 100% 92%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 252 83% 75%;
+    --eventPrimary: #9b87f5;
+    --eventSecondary: #7E69AB;
+    --eventTertiary: #6E59A5;
+    --eventDark: #1A1F2C;
+    --eventLight: #D6BCFA;
+    --eventNeutral: #8E9196;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border selection:bg-white/10 selection:text-white;
   }
-
+  
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply bg-background text-foreground font-inter antialiased;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-lg rounded-xl;
+    @apply bg-card/70 backdrop-blur-md border border-white/10 shadow-lg rounded-xl;
   }
   
   .btn-primary {
@@ -89,11 +66,11 @@
   }
   
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-eventDark border border-gray-300 font-medium px-6 py-2 rounded-lg transition-all duration-300;
+    @apply bg-secondary hover:bg-secondary/80 text-white border border-white/10 font-medium px-6 py-2 rounded-lg transition-all duration-300;
   }
   
   .input-primary {
-    @apply bg-white/80 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-eventPrimary/50;
+    @apply bg-secondary/50 border border-border rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-eventPrimary/50;
   }
   
   .card-hover {
@@ -112,7 +89,7 @@
 
 /* Custom utilities */
 .text-shadow {
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .text-gradient {
@@ -126,4 +103,46 @@
 
 .hover-scale {
   @apply transition-transform duration-300 hover:scale-105;
+}
+
+/* Glass effect for modals */
+.glass-modal {
+  @apply bg-black/50 backdrop-blur-md border border-white/10 shadow-xl rounded-xl;
+}
+
+/* Button animations */
+.btn-animated {
+  @apply relative overflow-hidden transition-all duration-300;
+}
+
+.btn-animated::after {
+  @apply content-[''] absolute top-0 h-full w-0 bg-white/20 transition-all duration-300 ease-out;
+  left: -10%;
+  transform: skewX(-15deg);
+}
+
+.btn-animated:hover::after {
+  @apply w-[120%];
+}
+
+/* Form inputs for dark theme */
+.dark-input {
+  @apply bg-secondary border-border text-white placeholder:text-gray-400 focus:border-eventPrimary;
+}
+
+/* Toast notifications styling */
+.toast-success {
+  @apply bg-green-900 border-green-500 text-white;
+}
+
+.toast-error {
+  @apply bg-red-900 border-red-500 text-white;
+}
+
+.toast-warning {
+  @apply bg-yellow-900 border-yellow-500 text-white;
+}
+
+.toast-info {
+  @apply bg-blue-900 border-blue-500 text-white;
 }
