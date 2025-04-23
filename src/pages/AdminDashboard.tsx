@@ -13,7 +13,9 @@ import {
   Edit, 
   Trash2, 
   Plus, 
-  Bell
+  Bell,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useEvents } from "@/context/EventContext";
@@ -32,7 +34,7 @@ const AdminDashboard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   
   const { user } = useAuth();
-  const { events, addEvent, updateEvent, deleteEvent } = useEvents();
+  const { events, addEvent, updateEvent, deleteEvent, toggleEventVisibility } = useEvents();
   const { unreadCount } = useNotifications();
   const { toast } = useToast();
   const { openModal } = useModal();
@@ -58,12 +60,25 @@ const AdminDashboard = () => {
     setIsDeleteDialogOpen(true);
   };
 
+  const handleToggleVisibility = async (event: any) => {
+    try {
+      await toggleEventVisibility(event.id);
+    } catch (error) {
+      toast({
+        title: "Operation failed",
+        description: "There was an error toggling event visibility.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleCreateEvent = async (eventData: any) => {
     try {
       await addEvent({
         ...eventData,
         attendees: 0,
-        isPaid: !!eventData.price && eventData.price > 0
+        isPaid: !!eventData.price && eventData.price > 0,
+        visible: true
       });
       setIsDialogOpen(false);
       toast({
@@ -231,6 +246,7 @@ const AdminDashboard = () => {
                         <th className="px-6 py-3">Attendees</th>
                         <th className="px-6 py-3">Price</th>
                         <th className="px-6 py-3">Status</th>
+                        <th className="px-6 py-3">Visibility</th>
                         <th className="px-6 py-3">Actions</th>
                       </tr>
                     </thead>
@@ -259,7 +275,33 @@ const AdminDashboard = () => {
                             )}
                           </td>
                           <td className="px-6 py-4">
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                              event.visible !== false 
+                                ? 'bg-blue-900/20 text-blue-400' 
+                                : 'bg-gray-700/20 text-gray-400'
+                            }`}>
+                              {event.visible !== false ? 'Visible' : 'Hidden'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
                             <div className="flex gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className={`${
+                                  event.visible !== false 
+                                    ? 'text-blue-400 hover:text-blue-300 hover:bg-blue-900/20' 
+                                    : 'text-gray-400 hover:text-gray-300 hover:bg-gray-700/20'
+                                }`}
+                                onClick={() => handleToggleVisibility(event)}
+                                title={event.visible !== false ? "Hide event" : "Show event"}
+                              >
+                                {event.visible !== false ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </Button>
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
@@ -283,7 +325,7 @@ const AdminDashboard = () => {
                       
                       {events.length === 0 && (
                         <tr>
-                          <td colSpan={8} className="px-6 py-8 text-center text-gray-400">
+                          <td colSpan={9} className="px-6 py-8 text-center text-gray-400">
                             No events found. Create your first event!
                           </td>
                         </tr>

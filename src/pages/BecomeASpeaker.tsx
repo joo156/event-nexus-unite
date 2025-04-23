@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +20,7 @@ const formSchema = z.object({
   linkedin: z.string().url({ message: "Please enter a valid LinkedIn URL." }).optional().or(z.literal('')),
   twitter: z.string().url({ message: "Please enter a valid Twitter URL." }).optional().or(z.literal('')),
   instagram: z.string().url({ message: "Please enter a valid Instagram URL." }).optional().or(z.literal('')),
+  facebook: z.string().url({ message: "Please enter a valid Facebook URL." }).optional().or(z.literal('')),
   bio: z.string().min(50, { message: "Bio must be at least 50 characters long." }),
 });
 
@@ -29,6 +30,7 @@ const BecomeASpeaker = () => {
   const { addSpeakerProposal } = useEvents();
   const { addNotification } = useNotifications();
   const { toast } = useToast();
+  const formRef = useRef<HTMLDivElement>(null);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,9 +40,16 @@ const BecomeASpeaker = () => {
       linkedin: "",
       twitter: "",
       instagram: "",
+      facebook: "",
       bio: "",
     },
   });
+
+  const scrollToForm = () => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
@@ -50,6 +59,7 @@ const BecomeASpeaker = () => {
         linkedin: values.linkedin || undefined,
         twitter: values.twitter || undefined,
         instagram: values.instagram || undefined,
+        facebook: values.facebook || undefined
       };
       
       await addSpeakerProposal({
@@ -92,8 +102,53 @@ const BecomeASpeaker = () => {
         subtitle="Share your expertise and insights with our community"
       />
       
-      <div className="container mx-auto py-12 px-4 max-w-3xl">
-        <div className="glass-card p-8">
+      <div className="container mx-auto py-12 px-4">
+        <div className="max-w-3xl mx-auto mb-16">
+          <div className="glass-card p-8">
+            <h2 className="text-2xl font-bold mb-4 text-white">Why Speak at eventNexus?</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-white/5 p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Build Your Brand</h3>
+                <p className="text-gray-300">
+                  Showcase your expertise to our engaged community of professionals and tech enthusiasts.
+                  Speaking at our events helps establish you as a thought leader in your field.
+                </p>
+              </div>
+              <div className="bg-white/5 p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Connect with Industry Leaders</h3>
+                <p className="text-gray-300">
+                  Network with other speakers, attendees, and industry professionals. 
+                  Form valuable relationships that can lead to new opportunities.
+                </p>
+              </div>
+              <div className="bg-white/5 p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Share Your Knowledge</h3>
+                <p className="text-gray-300">
+                  Help others grow by sharing your unique insights and experiences.
+                  Your knowledge can inspire and educate our diverse audience.
+                </p>
+              </div>
+              <div className="bg-white/5 p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Professional Growth</h3>
+                <p className="text-gray-300">
+                  Refine your presentation skills and gain valuable feedback.
+                  Add prestigious speaking engagements to your professional portfolio.
+                </p>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <Button 
+                className="bg-eventPrimary hover:bg-eventSecondary btn-animated text-lg px-8 py-6"
+                onClick={scrollToForm}
+              >
+                Apply as a Speaker
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="max-w-3xl mx-auto glass-card p-8" ref={formRef}>
           {!isSubmitted ? (
             <>
               <div className="mb-8 text-center">
@@ -209,6 +264,27 @@ const BecomeASpeaker = () => {
                               <div className="relative">
                                 <Input 
                                   placeholder="https://instagram.com/yourusername" 
+                                  className="dark-input pl-10"
+                                  {...field} 
+                                />
+                                <Link className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="facebook"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-300">Facebook</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input 
+                                  placeholder="https://facebook.com/yourusername" 
                                   className="dark-input pl-10"
                                   {...field} 
                                 />

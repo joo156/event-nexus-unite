@@ -30,7 +30,8 @@ const EventForm = ({ event, onSubmit, onCancel }: EventFormProps) => {
     isPaid: event?.isPaid || false,
     availableSpots: event?.availableSpots || '',
     learningPoints: event?.learningPoints || [''],
-    featured: event?.featured || false
+    featured: event?.featured || false,
+    visible: event?.visible !== false // Default to true if undefined
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -140,6 +141,7 @@ const EventForm = ({ event, onSubmit, onCancel }: EventFormProps) => {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    id="date"
                     variant="outline"
                     className="w-full dark-input mt-1 flex justify-start"
                   >
@@ -147,12 +149,13 @@ const EventForm = ({ event, onSubmit, onCancel }: EventFormProps) => {
                     {format(formData.date, 'PPP')}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-card border-white/10">
+                <PopoverContent className="w-auto p-0 bg-card border-white/10 pointer-events-auto">
                   <Calendar
                     mode="single"
                     selected={formData.date}
                     onSelect={handleDateChange}
                     initialFocus
+                    className="p-3 pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
@@ -292,13 +295,24 @@ const EventForm = ({ event, onSubmit, onCancel }: EventFormProps) => {
             </Button>
           </div>
           
-          <div className="flex items-center space-x-2 mt-4">
-            <Switch
-              id="featured"
-              checked={formData.featured}
-              onCheckedChange={(checked) => handleSwitchChange('featured', checked)}
-            />
-            <Label htmlFor="featured">Featured Event</Label>
+          <div className="flex flex-col space-y-4 mt-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="featured"
+                checked={formData.featured}
+                onCheckedChange={(checked) => handleSwitchChange('featured', checked)}
+              />
+              <Label htmlFor="featured">Featured Event</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="visible"
+                checked={formData.visible}
+                onCheckedChange={(checked) => handleSwitchChange('visible', checked)}
+              />
+              <Label htmlFor="visible">Visible to Users</Label>
+            </div>
           </div>
         </div>
       </div>

@@ -42,6 +42,7 @@ type Event = {
   attendees?: number;
   availableSpots?: number;
   featured?: boolean;
+  visible?: boolean;
   learningPoints?: string[];
   schedule?: Schedule[];
   speakers?: Speaker[];
@@ -56,6 +57,7 @@ type SpeakerProposal = {
     linkedin?: string;
     instagram?: string;
     twitter?: string;
+    facebook?: string;
   };
   bio: string;
   createdAt: string;
@@ -73,6 +75,7 @@ type EventContextType = {
   speakerProposals: SpeakerProposal[];
   addSpeakerProposal: (proposal: Omit<SpeakerProposal, "id" | "createdAt" | "isRead">) => Promise<SpeakerProposal>;
   markProposalAsRead: (id: string) => Promise<boolean>;
+  toggleEventVisibility: (id: number) => Promise<Event | null>;
 };
 
 const EventContext = createContext<EventContextType | null>(null);
@@ -97,12 +100,24 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         setEvents(JSON.parse(storedEvents));
       } catch (error) {
         console.error("Error parsing stored events:", error);
-        setEvents(mockEvents);
-        localStorage.setItem("events", JSON.stringify(mockEvents));
+        // Ensure mockEvents has the required fields before setting to state
+        const processedMockEvents = mockEvents.map(event => ({
+          ...event,
+          isPaid: !!event.price && event.price > 0,
+          visible: event.visible !== false // Default to visible if not specified
+        }));
+        setEvents(processedMockEvents);
+        localStorage.setItem("events", JSON.stringify(processedMockEvents));
       }
     } else {
-      setEvents(mockEvents);
-      localStorage.setItem("events", JSON.stringify(mockEvents));
+      // Ensure mockEvents has the required fields before setting to state
+      const processedMockEvents = mockEvents.map(event => ({
+        ...event,
+        isPaid: !!event.price && event.price > 0,
+        visible: true
+      }));
+      setEvents(processedMockEvents);
+      localStorage.setItem("events", JSON.stringify(processedMockEvents));
     }
     
     // Load speaker proposals if available
@@ -147,7 +162,8 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         const newEvent: Event = {
           ...event,
           id: Date.now(),
-          attendees: 0
+          attendees: 0,
+          visible: true
         };
         
         const updatedEvents = [...events, newEvent];
@@ -186,6 +202,43 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         toast({
           title: "Event updated",
           description: "The event has been successfully updated.",
+        });
+        
+        resolve(updatedEvent);
+      }, 500);
+    });
+  };
+
+  const toggleEventVisibility = async (id: number): Promise<Event | null> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const eventIndex = events.findIndex(e => e.id === id);
+        if (eventIndex === -1) {
+          toast({
+            title: "Update failed",
+            description: "Event not found.",
+            variant: "destructive",
+          });
+          resolve(null);
+          return;
+        }
+        
+        const currentEvent = events[eventIndex];
+        const updatedEvent: Event = { 
+          ...currentEvent, 
+          visible: !currentEvent.visible 
+        };
+        
+        const updatedEvents = [...events];
+        updatedEvents[eventIndex] = updatedEvent;
+        
+        saveEvents(updatedEvents);
+        
+        toast({
+          title: currentEvent.visible ? "Event hidden" : "Event visible",
+          description: currentEvent.visible 
+            ? "The event is now hidden from users." 
+            : "The event is now visible to users.",
         });
         
         resolve(updatedEvent);
@@ -341,7 +394,8 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         getUserRegisteredEvents,
         speakerProposals,
         addSpeakerProposal,
-        markProposalAsRead
+        markProposalAsRead,
+        toggleEventVisibility
       }}
     >
       {children}
