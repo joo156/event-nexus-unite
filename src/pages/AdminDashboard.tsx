@@ -1,71 +1,35 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Users, Ticket, BarChart } from "lucide-react";
 import { mockEvents } from "@/data/mockData";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
+  const { toast } = useToast();
   
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock authentication - in a real app, this would validate against a backend
-    if (email === "admin@eventnexus.com" && password === "password123") {
-      setIsAuthenticated(true);
-    } else {
-      alert("Invalid credentials. Please try again.");
+  useEffect(() => {
+    // Check if user is logged in and is an admin
+    const authUser = localStorage.getItem("authUser");
+    
+    if (authUser) {
+      try {
+        const parsedUser = JSON.parse(authUser);
+        setUser(parsedUser);
+        
+        toast({
+          title: "Welcome to Admin Dashboard",
+          description: `Logged in as ${parsedUser.name}`,
+        });
+      } catch (error) {
+        console.error("Error parsing auth user:", error);
+      }
     }
-  };
-  
-  if (!isAuthenticated) {
-    return (
-      <Layout>
-        <div className="container mx-auto py-16 px-4 max-w-md">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-center">Admin Login</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium">Email</label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full input-primary"
-                    placeholder="admin@eventnexus.com"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="password" className="text-sm font-medium">Password</label>
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full input-primary"
-                    placeholder="password123"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full bg-eventPrimary hover:bg-eventSecondary">
-                  Login
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </Layout>
-    );
-  }
+  }, [toast]);
   
   // Mock data for the dashboard
   const totalEvents = mockEvents.length;
@@ -75,7 +39,15 @@ const AdminDashboard = () => {
   return (
     <Layout>
       <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            {user && <p className="text-gray-500">Logged in as {user.email}</p>}
+          </div>
+          <Button className="bg-eventPrimary hover:bg-eventSecondary mt-4 sm:mt-0">
+            Create New Event
+          </Button>
+        </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card className="hover-lift">
