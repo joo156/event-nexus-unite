@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import HeroSection from "@/components/common/HeroSection";
@@ -182,9 +181,11 @@ const Index = () => {
             Become an event organizer on eventNexus and reach thousands of attendees worldwide.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-white text-eventPrimary hover:bg-gray-100">
-              Become a Speaker
-            </Button>
+            <Link to="/become-speaker">
+              <Button size="lg" className="bg-white text-eventPrimary hover:bg-gray-100">
+                Become a Speaker
+              </Button>
+            </Link>
             <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
               Learn More
             </Button>
