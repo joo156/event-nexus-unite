@@ -1,19 +1,49 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import HeroSection from "@/components/common/HeroSection";
 import EventCard from "@/components/events/EventCard";
 import EventFilters from "@/components/events/EventFilters";
-import { mockEvents } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
+import { useEvents } from "@/context/EventContext";
+import { formatDistanceToNow } from "date-fns";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogTitle, 
+  DialogHeader,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, Filter, X, Check } from "lucide-react";
 
 const EventsPage = () => {
+  const { events } = useEvents();
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  const [filteredEvents, setFilteredEvents] = useState(events.filter(e => e.visible !== false));
+  const [showFiltersDialog, setShowFiltersDialog] = useState(false);
+  const [filters, setFilters] = useState({
+    search: "",
+    category: "",
+    location: "",
+    isPaid: null as boolean | null,
+    startDate: null as Date | null,
+    endDate: null as Date | null
+  });
   const eventsPerPage = 9;
   
+  useEffect(() => {
+    // Update filtered events whenever the events list changes (e.g., from admin updates)
+    setFilteredEvents(events.filter(e => e.visible !== false));
+  }, [events]);
+
+  // Find the live demo event if exists
+  const liveEvent = events.find(event => event.id === 99999);
+  const isLiveEventSoon = liveEvent && new Date(liveEvent.date + " " + liveEvent.time) > new Date();
+  
   const handleFilterChange = (filters: any) => {
-    let filtered = [...mockEvents];
+    let filtered = [...events].filter(e => e.visible !== false);
 
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
@@ -36,8 +66,46 @@ const EventsPage = () => {
       );
     }
 
+    if (filters.isPaid === true) {
+      filtered = filtered.filter(event => event.isPaid);
+    } else if (filters.isPaid === false) {
+      filtered = filtered.filter(event => !event.isPaid);
+    }
+
+    if (filters.startDate) {
+      filtered = filtered.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate >= filters.startDate!;
+      });
+    }
+
+    if (filters.endDate) {
+      filtered = filtered.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate <= filters.endDate!;
+      });
+    }
+
     setFilteredEvents(filtered);
     setCurrentPage(1);
+  };
+
+  const applyFilters = () => {
+    handleFilterChange(filters);
+    setShowFiltersDialog(false);
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      search: "",
+      category: "",
+      location: "",
+      isPaid: null,
+      startDate: null,
+      endDate: null
+    });
+    setFilteredEvents(events.filter(e => e.visible !== false));
+    setShowFiltersDialog(false);
   };
 
   // Calculate pagination
@@ -58,7 +126,53 @@ const EventsPage = () => {
 
       <section className="section-padding">
         <div className="container mx-auto">
-          <EventFilters onFilterChange={handleFilterChange} />
+          <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
+            <EventFilters onFilterChange={handleFilterChange} />
+            
+            <Button 
+              onClick={() => setShowFiltersDialog(true)} 
+              variant="outline" 
+              className="flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Advanced Filters
+            </Button>
+          </div>
+
+          {/* Live Event Banner (if available) */}
+          {liveEvent && isLiveEventSoon && (
+            <div className="mb-8 bg-gradient-to-r from-red-600 to-pink-600 rounded-lg p-4 shadow-lg">
+              <div className="flex flex-wrap items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="absolute -top-1 -left-1">
+                      <Badge variant="destructive" className="animate-pulse flex gap-1 items-center">
+                        <span className="h-2 w-2 rounded-full bg-white"></span>
+                        LIVE
+                      </Badge>
+                    </div>
+                    <img 
+                      src={liveEvent.image} 
+                      alt={liveEvent.title} 
+                      className="h-16 w-16 rounded object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-white text-lg font-bold">{liveEvent.title}</h3>
+                    <p className="text-white/80 text-sm flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> Starting soon
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  className="bg-white text-red-600 hover:bg-gray-100"
+                  onClick={() => window.location.href = `/live/${liveEvent.id}`}
+                >
+                  Join Now
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {currentEvents.length > 0 ? (
@@ -74,6 +188,7 @@ const EventsPage = () => {
                   location={event.location}
                   tags={event.tags}
                   featured={event.featured}
+                  isLive={event.id === 99999}
                 />
               ))
             ) : (
@@ -122,6 +237,74 @@ const EventsPage = () => {
           )}
         </div>
       </section>
+
+      {/* Advanced Filters Dialog */}
+      <Dialog open={showFiltersDialog} onOpenChange={setShowFiltersDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Advanced Filters</DialogTitle>
+            <DialogDescription>
+              Filter events by specific criteria
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Event Type</label>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant={filters.isPaid === true ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilters({...filters, isPaid: true})}
+                  >
+                    Paid
+                  </Button>
+                  <Button 
+                    variant={filters.isPaid === false ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilters({...filters, isPaid: false})}
+                  >
+                    Free
+                  </Button>
+                  <Button 
+                    variant={filters.isPaid === null ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilters({...filters, isPaid: null})}
+                  >
+                    All
+                  </Button>
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-1 block">Category</label>
+                <div className="flex flex-wrap gap-2">
+                  {['Technology', 'Business', 'Design', 'Marketing', 'Live'].map(category => (
+                    <Button 
+                      key={category}
+                      variant={filters.category === category ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilters({...filters, category: filters.category === category ? '' : category})}
+                    >
+                      {category}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex justify-between">
+            <Button variant="outline" onClick={resetFilters}>
+              <X className="h-4 w-4 mr-1" /> Reset
+            </Button>
+            <Button onClick={applyFilters}>
+              <Check className="h-4 w-4 mr-1" /> Apply Filters
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

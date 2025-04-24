@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import HeroSection from "@/components/common/HeroSection";
 import EventCard from "@/components/events/EventCard";
@@ -6,13 +6,22 @@ import EventFilters from "@/components/events/EventFilters";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import { mockEvents } from "@/data/mockData";
+import { useEvents } from "@/context/EventContext";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  const { events } = useEvents();
+  const [filteredEvents, setFilteredEvents] = useState(events.filter(e => e.visible !== false));
+  const speakerSectionRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    setFilteredEvents(events.filter(e => e.visible !== false));
+  }, [events]);
 
   const handleFilterChange = (filters: any) => {
-    let filtered = [...mockEvents];
+    let filtered = [...events].filter(e => e.visible !== false);
 
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
@@ -38,9 +47,19 @@ const Index = () => {
     setFilteredEvents(filtered);
   };
 
-  const featuredEvents = filteredEvents.filter(event => event.featured).slice(0, 6);
+  const handleLearnMoreClick = () => {
+    if (speakerSectionRef.current) {
+      speakerSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const liveEvent = events.find(event => event.id === 99999);
+  const isLiveEventSoon = liveEvent && new Date(liveEvent.date + " " + liveEvent.time) > new Date();
+
+  const featuredEvents = filteredEvents.filter(event => event.featured || event.id === 99999).slice(0, 6);
   const recentEvents = filteredEvents.slice(0, 3);
-  const speakers = mockEvents
+  
+  const speakers = events
     .flatMap(event => event.speakers || [])
     .filter((speaker, index, self) => 
       index === self.findIndex(s => s.id === speaker.id)
@@ -54,6 +73,39 @@ const Index = () => {
         subtitle="Join thousands of attendees on the leading platform for virtual and hybrid events"
         bgImage="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80"
       />
+
+      {liveEvent && isLiveEventSoon && (
+        <div className="container mx-auto mt-6 mb-0">
+          <div className="bg-gradient-to-r from-red-600 to-pink-600 rounded-lg p-4 shadow-lg">
+            <div className="flex flex-wrap items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="absolute -top-1 -left-1">
+                    <Badge variant="destructive" className="animate-pulse flex gap-1 items-center">
+                      <span className="h-2 w-2 rounded-full bg-white"></span>
+                      LIVE
+                    </Badge>
+                  </div>
+                  <img 
+                    src={liveEvent.image} 
+                    alt={liveEvent.title} 
+                    className="h-16 w-16 rounded object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-white text-lg font-bold">{liveEvent.title}</h3>
+                  <p className="text-white/80 text-sm">Starting soon - Join now!</p>
+                </div>
+              </div>
+              <Link to={`/live/${liveEvent.id}`}>
+                <Button className="bg-white text-red-600 hover:bg-gray-100">
+                  Join Live Event
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       <section className="section-padding">
         <div className="container mx-auto">
@@ -84,6 +136,7 @@ const Index = () => {
                   location={event.location}
                   tags={event.tags}
                   featured={event.featured}
+                  isLive={event.id === 99999}
                 />
               ))
             ) : (
@@ -145,7 +198,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="section-padding">
+      <section className="section-padding" ref={speakerSectionRef}>
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">
             <span className="text-gradient">Featured Speakers</span>
@@ -169,7 +222,9 @@ const Index = () => {
           </div>
           
           <div className="text-center mt-10">
-            <Button className="bg-eventPrimary hover:bg-eventSecondary px-8">View All Speakers</Button>
+            <Link to="/events">
+              <Button className="bg-eventPrimary hover:bg-eventSecondary px-8">View All Speakers</Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -186,7 +241,12 @@ const Index = () => {
                 Become a Speaker
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-white border-white hover:bg-white/10"
+              onClick={handleLearnMoreClick}
+            >
               Learn More
             </Button>
           </div>

@@ -1,5 +1,5 @@
-
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +15,10 @@ import {
   Plus, 
   Bell,
   Eye,
-  EyeOff
+  EyeOff,
+  Check,
+  X,
+  Mail
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useEvents } from "@/context/EventContext";
@@ -32,10 +35,19 @@ const AdminDashboard = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showNotifications, setShowNotifications] = useState(false);
+  const location = useLocation();
+  
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab && ['events', 'attendees', 'speakers', 'settings'].includes(tab)) {
+      setSelectedTab(tab);
+    }
+  }, [location]);
   
   const { user } = useAuth();
-  const { events, addEvent, updateEvent, deleteEvent, toggleEventVisibility } = useEvents();
-  const { unreadCount } = useNotifications();
+  const { events, addEvent, updateEvent, deleteEvent, toggleEventVisibility, speakerProposals, markProposalAsRead } = useEvents();
+  const { unreadCount, addNotification } = useNotifications();
   const { toast } = useToast();
   const { openModal } = useModal();
   
@@ -45,6 +57,35 @@ const AdminDashboard = () => {
     .filter(event => event.isPaid && event.price && event.attendees)
     .reduce((sum, event) => sum + (event.price || 0) * (event.attendees || 0), 0);
   
+  const [selectedProposal, setSelectedProposal] = useState<any>(null);
+  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
+  
+  const handleViewSpeakerProposal = (proposal: any) => {
+    setSelectedProposal(proposal);
+    setIsProposalModalOpen(true);
+    if (!proposal.isRead) {
+      markProposalAsRead(proposal.id);
+    }
+  };
+  
+  const handleApproveSpeakerProposal = (proposal: any) => {
+    markProposalAsRead(proposal.id);
+    toast({
+      title: "Proposal Approved",
+      description: `${proposal.name} has been approved as a speaker.`,
+    });
+    setIsProposalModalOpen(false);
+  };
+  
+  const handleRejectSpeakerProposal = (proposal: any) => {
+    markProposalAsRead(proposal.id);
+    toast({
+      title: "Proposal Rejected",
+      description: `${proposal.name}'s proposal has been rejected.`,
+    });
+    setIsProposalModalOpen(false);
+  };
+
   const handleOpenCreateDialog = () => {
     setSelectedEvent(null);
     setIsDialogOpen(true);
@@ -134,7 +175,7 @@ const AdminDashboard = () => {
       });
     }
   };
-  
+
   return (
     <Layout>
       <div className="container mx-auto py-8 px-4">
@@ -385,38 +426,77 @@ const AdminDashboard = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-400 mb-6">
-                  Manage speakers for your events. Add new speakers and update existing speaker profiles.
-                </p>
-                
-                {events.some(event => event.speakers && event.speakers.length > 0) ? (
-                  events.flatMap(event => event.speakers || [])
-                    .filter((speaker, index, self) => 
-                      index === self.findIndex(s => s.id === speaker.id)
-                    )
-                    .map(speaker => (
-                      <div key={speaker.id} className="flex items-center space-x-4 mb-4 p-3 rounded-lg hover:bg-secondary">
-                        <img 
-                          src={speaker.image} 
-                          alt={speaker.name} 
-                          className="w-12 h-12 rounded-full object-cover"
-                        />
-                        <div>
-                          <p className="font-medium text-white">{speaker.name}</p>
-                          <p className="text-sm text-gray-400">{speaker.title}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-lg font-medium text-white mb-4">Speakers</h3>
+                    <div className="space-y-4">
+                      {events.flatMap(event => event.speakers || [])
+                        .filter((speaker, index, self) => 
+                          index === self.findIndex(s => s.id === speaker.id)
+                        ).length > 0 ? (
+                        events.flatMap(event => event.speakers || [])
+                          .filter((speaker, index, self) => 
+                            index === self.findIndex(s => s.id === speaker.id)
+                          )
+                          .map(speaker => (
+                            <div key={speaker.id} className="flex items-center space-x-4 p-3 rounded-lg hover:bg-secondary">
+                              <img 
+                                src={speaker.image} 
+                                alt={speaker.name} 
+                                className="w-12 h-12 rounded-full object-cover"
+                              />
+                              <div>
+                                <p className="font-medium text-white">{speaker.name}</p>
+                                <p className="text-sm text-gray-400">{speaker.title}</p>
+                              </div>
+                              <div className="ml-auto flex">
+                                <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20">
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-gray-400">No speakers found.</p>
                         </div>
-                        <div className="ml-auto flex">
-                          <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                ) : (
-                  <div className="text-center py-12">
-                    <p className="text-gray-400">No speakers found.</p>
+                      )}
+                    </div>
                   </div>
-                )}
+                  
+                  <div>
+                    <h3 className="text-lg font-medium text-white mb-4">Speaker Proposals</h3>
+                    <div className="space-y-4">
+                      {speakerProposals.length > 0 ? (
+                        speakerProposals.map(proposal => (
+                          <div 
+                            key={proposal.id} 
+                            className={`p-3 rounded-lg hover:bg-secondary cursor-pointer ${!proposal.isRead ? 'bg-blue-900/20' : ''}`}
+                            onClick={() => handleViewSpeakerProposal(proposal)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium text-white">{proposal.name}</p>
+                                <p className="text-sm text-gray-400">{proposal.email}</p>
+                              </div>
+                              {!proposal.isRead && (
+                                <Badge className="bg-blue-500">New</Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-400 line-clamp-2 mt-2">{proposal.bio}</p>
+                            <div className="mt-2 text-xs text-gray-500">
+                              {new Date(proposal.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-gray-400">No speaker proposals yet.</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -436,7 +516,6 @@ const AdminDashboard = () => {
         </Tabs>
       </div>
       
-      {/* Create/Edit Event Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="glass-modal text-white sm:max-w-2xl">
           <DialogHeader>
@@ -452,7 +531,6 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Delete Event Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="glass-modal text-white sm:max-w-md">
           <DeleteEventDialog
@@ -463,7 +541,84 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Notifications Panel */}
+      <Dialog open={isProposalModalOpen} onOpenChange={setIsProposalModalOpen}>
+        <DialogContent className="glass-modal text-white sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white">Speaker Proposal</DialogTitle>
+          </DialogHeader>
+          
+          {selectedProposal && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">Name</h4>
+                <p className="text-white">{selectedProposal.name}</p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">Email</h4>
+                <p className="text-white">{selectedProposal.email}</p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">Social Links</h4>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  {selectedProposal.socialLinks.linkedin && (
+                    <a href={selectedProposal.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" 
+                       className="text-blue-400 hover:underline">LinkedIn</a>
+                  )}
+                  {selectedProposal.socialLinks.twitter && (
+                    <a href={selectedProposal.socialLinks.twitter} target="_blank" rel="noopener noreferrer" 
+                       className="text-blue-400 hover:underline">Twitter</a>
+                  )}
+                  {selectedProposal.socialLinks.instagram && (
+                    <a href={selectedProposal.socialLinks.instagram} target="_blank" rel="noopener noreferrer" 
+                       className="text-blue-400 hover:underline">Instagram</a>
+                  )}
+                  {selectedProposal.socialLinks.facebook && (
+                    <a href={selectedProposal.socialLinks.facebook} target="_blank" rel="noopener noreferrer" 
+                       className="text-blue-400 hover:underline">Facebook</a>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">Bio</h4>
+                <p className="text-white mt-1">{selectedProposal.bio}</p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">Submitted</h4>
+                <p className="text-white">{new Date(selectedProposal.createdAt).toLocaleString()}</p>
+              </div>
+              
+              <div className="flex space-x-3">
+                <Button 
+                  className="flex-1 bg-green-600 hover:bg-green-700" 
+                  onClick={() => handleApproveSpeakerProposal(selectedProposal)}
+                >
+                  <Check className="mr-1 h-4 w-4" /> Approve
+                </Button>
+                <Button 
+                  className="flex-1 bg-red-600 hover:bg-red-700" 
+                  onClick={() => handleRejectSpeakerProposal(selectedProposal)}
+                >
+                  <X className="mr-1 h-4 w-4" /> Reject
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1 border-white/20 text-white"
+                  onClick={() => {
+                    window.location.href = `mailto:${selectedProposal.email}`;
+                  }}
+                >
+                  <Mail className="mr-1 h-4 w-4" /> Contact
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
       {showNotifications && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div 

@@ -42,7 +42,7 @@ type Event = {
   attendees?: number;
   availableSpots?: number;
   featured?: boolean;
-  visible?: boolean;
+  visible: boolean;
   learningPoints?: string[];
   schedule?: Schedule[];
   speakers?: Speaker[];
@@ -97,24 +97,41 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     const storedEvents = localStorage.getItem("events");
     if (storedEvents) {
       try {
-        setEvents(JSON.parse(storedEvents));
-      } catch (error) {
-        console.error("Error parsing stored events:", error);
-        // Ensure mockEvents has the required fields before setting to state
-        const processedMockEvents = mockEvents.map(event => ({
+        const parsedEvents = JSON.parse(storedEvents);
+        // Ensure proper typing with the updated Event type that includes visible property
+        const typedEvents: Event[] = parsedEvents.map((event: any) => ({
           ...event,
           isPaid: !!event.price && event.price > 0,
           visible: event.visible !== false // Default to visible if not specified
+        }));
+        setEvents(typedEvents);
+      } catch (error) {
+        console.error("Error parsing stored events:", error);
+        // Ensure mockEvents has the required fields before setting to state
+        const processedMockEvents: Event[] = mockEvents.map((event: any) => ({
+          ...event,
+          isPaid: !!event.price && event.price > 0,
+          visible: event.visible !== false, // Default to visible if not specified
+          // Convert any numeric speaker IDs to strings to match our type
+          speakers: event.speakers?.map((speaker: any) => ({
+            ...speaker,
+            id: String(speaker.id)
+          }))
         }));
         setEvents(processedMockEvents);
         localStorage.setItem("events", JSON.stringify(processedMockEvents));
       }
     } else {
       // Ensure mockEvents has the required fields before setting to state
-      const processedMockEvents = mockEvents.map(event => ({
+      const processedMockEvents: Event[] = mockEvents.map((event: any) => ({
         ...event,
         isPaid: !!event.price && event.price > 0,
-        visible: true
+        visible: true,
+        // Convert any numeric speaker IDs to strings to match our type
+        speakers: event.speakers?.map((speaker: any) => ({
+          ...speaker,
+          id: String(speaker.id)
+        }))
       }));
       setEvents(processedMockEvents);
       localStorage.setItem("events", JSON.stringify(processedMockEvents));
