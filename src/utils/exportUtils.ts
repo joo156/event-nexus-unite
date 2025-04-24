@@ -1,4 +1,6 @@
 
+import { supabase } from "@/integrations/supabase/client";
+
 export const exportAttendeeList = async (eventId: number) => {
   const { data: registrations, error } = await supabase
     .from('registrations')

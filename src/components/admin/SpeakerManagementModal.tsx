@@ -8,18 +8,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-type SpeakerFormData = {
-  name: string;
-  title: string;
-  bio: string;
-  image: string;
-};
+const speakerSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  title: z.string().min(1, "Title is required"),
+  bio: z.string().min(1, "Bio is required"),
+  image: z.string().url("Please enter a valid URL").min(1, "Image URL is required"),
+});
+
+type SpeakerFormData = z.infer<typeof speakerSchema>;
 
 type SpeakerManagementModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  eventId: number;
+  eventId: number | undefined;
   speaker?: {
     id: string;
     name: string;
@@ -39,6 +43,7 @@ export default function SpeakerManagementModal({
 }: SpeakerManagementModalProps) {
   const { toast } = useToast();
   const form = useForm<SpeakerFormData>({
+    resolver: zodResolver(speakerSchema),
     defaultValues: {
       name: speaker?.name || '',
       title: speaker?.title || '',
@@ -48,6 +53,15 @@ export default function SpeakerManagementModal({
   });
 
   const onSubmit = async (data: SpeakerFormData) => {
+    if (!eventId && !speaker) {
+      toast({
+        title: "Error",
+        description: "No event selected. Please select an event first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       if (speaker) {
         // Update existing speaker
@@ -78,10 +92,12 @@ export default function SpeakerManagementModal({
 
       onSpeakerUpdated();
       onClose();
-    } catch (error) {
+      form.reset();
+    } catch (error: any) {
+      console.error("Speaker save error:", error);
       toast({
         title: "Error",
-        description: "Failed to save speaker.",
+        description: error.message || "Failed to save speaker.",
         variant: "destructive",
       });
     }

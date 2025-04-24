@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -19,7 +20,7 @@ import {
   Check,
   X,
   Mail,
-  download
+  Download
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useEvents } from "@/context/EventContext";
@@ -31,6 +32,7 @@ import DeleteEventDialog from "@/components/admin/DeleteEventDialog";
 import NotificationsPanel from "@/components/admin/NotificationsPanel";
 import { Badge } from "@/components/ui/badge";
 import SpeakerManagementModal from "@/components/admin/SpeakerManagementModal";
+import { exportAttendeeList } from "@/utils/exportUtils";
 
 const AdminDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("events");
@@ -203,14 +205,12 @@ const AdminDashboard = () => {
   };
 
   const handleSpeakerUpdated = () => {
-    const storedEvents = localStorage.getItem("events");
-    if (storedEvents) {
-      try {
-        setEvents(JSON.parse(storedEvents));
-      } catch (error) {
-        console.error("Error parsing stored events:", error);
-      }
-    }
+    // Refresh events data to show updated speakers
+    // No need to manually set events as the context will handle this
+    toast({
+      title: "Success",
+      description: "Speaker data has been updated successfully."
+    });
   };
 
   return (
@@ -439,7 +439,7 @@ const AdminDashboard = () => {
                           disabled={!event.attendees}
                           onClick={() => handleExportAttendees(event.id)}
                         >
-                          <download className="mr-2 h-4 w-4" />
+                          <Download className="mr-2 h-4 w-4" />
                           Export Attendee List
                         </Button>
                       </div>
