@@ -66,6 +66,8 @@ const Navbar = () => {
                   <Link to="/about" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">About Us</Link>
                   <Link to="/contact" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Contact Us</Link>
                   <Link to="/become-speaker" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Become a Speaker</Link>
+                  <Link to="/help-center" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Help Center</Link>
+                  <Link to="/faqs" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">FAQs</Link>
                   {isLiveEventSoon && (
                     <Link 
                       to={`/live/${liveEvent?.id}`} 
@@ -127,6 +129,8 @@ const Navbar = () => {
           <Link to="/about" className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md">About</Link>
           <Link to="/contact" className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md">Contact</Link>
           <Link to="/become-speaker" className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md">Become a Speaker</Link>
+          <Link to="/help-center" className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md">Help Center</Link>
+          <Link to="/faqs" className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md">FAQs</Link>
           <Link to="/admin" className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md">Admin</Link>
           {isLiveEventSoon && (
             <Link 

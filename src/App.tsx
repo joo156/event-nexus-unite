@@ -25,6 +25,10 @@ import AdminProfile from "./pages/AdminProfile";
 import BecomeASpeaker from "./pages/BecomeASpeaker";
 import PaymentPage from "./pages/PaymentPage";
 import LiveEventPage from "./pages/LiveEventPage";
+import HelpCenter from "./pages/HelpCenter";
+import FAQs from "./pages/FAQs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 // Auth components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -140,6 +144,13 @@ const AppContent = () => {
         </ProtectedRoute>
       } />
       <Route path="/live/:eventId" element={<LiveEventPage />} />
+      
+      {/* New support pages */}
+      <Route path="/help-center" element={<HelpCenter />} />
+      <Route path="/faqs" element={<FAQs />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-of-service" element={<TermsOfService />} />
+      
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

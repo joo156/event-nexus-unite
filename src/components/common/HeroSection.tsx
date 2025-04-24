@@ -1,5 +1,6 @@
 
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface HeroSectionProps {
   title: string;
@@ -31,12 +32,16 @@ const HeroSection = ({ title, subtitle, bgImage }: HeroSectionProps) => {
           {subtitle}
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Button size="lg" className="bg-eventPrimary hover:bg-eventSecondary text-white px-8">
-            Explore Events
-          </Button>
-          <Button size="lg" variant="outline" className="bg-white/10 text-white border-white hover:bg-white/20 px-8">
-            Become a Speaker
-          </Button>
+          <Link to="/events">
+            <Button size="lg" className="bg-eventPrimary hover:bg-eventSecondary text-white px-8">
+              Explore Events
+            </Button>
+          </Link>
+          <Link to="/become-speaker">
+            <Button size="lg" variant="outline" className="bg-white/10 text-white border-white hover:bg-white/20 px-8">
+              Become a Speaker
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

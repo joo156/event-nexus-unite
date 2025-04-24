@@ -28,6 +28,7 @@ import { useModal } from "@/context/ModalContext";
 import EventForm from "@/components/admin/EventForm";
 import DeleteEventDialog from "@/components/admin/DeleteEventDialog";
 import NotificationsPanel from "@/components/admin/NotificationsPanel";
+import { Badge } from "@/components/ui/badge";
 
 const AdminDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("events");
