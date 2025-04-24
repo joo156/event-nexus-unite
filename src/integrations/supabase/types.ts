@@ -9,7 +9,248 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          attendees: number | null
+          availablespots: number | null
+          created_at: string | null
+          date: string
+          description: string
+          featured: boolean | null
+          id: number
+          image: string
+          ispaid: boolean
+          learningpoints: string[] | null
+          location: string
+          price: number | null
+          tags: string[]
+          time: string
+          title: string
+          visible: boolean
+        }
+        Insert: {
+          attendees?: number | null
+          availablespots?: number | null
+          created_at?: string | null
+          date: string
+          description: string
+          featured?: boolean | null
+          id?: number
+          image: string
+          ispaid?: boolean
+          learningpoints?: string[] | null
+          location: string
+          price?: number | null
+          tags?: string[]
+          time: string
+          title: string
+          visible?: boolean
+        }
+        Update: {
+          attendees?: number | null
+          availablespots?: number | null
+          created_at?: string | null
+          date?: string
+          description?: string
+          featured?: boolean | null
+          id?: number
+          image?: string
+          ispaid?: boolean
+          learningpoints?: string[] | null
+          location?: string
+          price?: number | null
+          tags?: string[]
+          time?: string
+          title?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar: string | null
+          id: string
+          name: string | null
+          role: string | null
+        }
+        Insert: {
+          avatar?: string | null
+          id: string
+          name?: string | null
+          role?: string | null
+        }
+        Update: {
+          avatar?: string | null
+          id?: string
+          name?: string | null
+          role?: string | null
+        }
+        Relationships: []
+      }
+      registrations: {
+        Row: {
+          created_at: string | null
+          event_id: number
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: number
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: number
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedules: {
+        Row: {
+          description: string
+          event_id: number | null
+          id: string
+          speaker_image: string | null
+          speaker_name: string | null
+          time: string
+          title: string
+        }
+        Insert: {
+          description: string
+          event_id?: number | null
+          id?: string
+          speaker_image?: string | null
+          speaker_name?: string | null
+          time: string
+          title: string
+        }
+        Update: {
+          description?: string
+          event_id?: number | null
+          id?: string
+          speaker_image?: string | null
+          speaker_name?: string | null
+          time?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedules_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      speaker_proposals: {
+        Row: {
+          bio: string
+          created_at: string | null
+          email: string
+          id: string
+          is_read: boolean | null
+          name: string
+          social_links: Json | null
+        }
+        Insert: {
+          bio: string
+          created_at?: string | null
+          email: string
+          id?: string
+          is_read?: boolean | null
+          name: string
+          social_links?: Json | null
+        }
+        Update: {
+          bio?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_read?: boolean | null
+          name?: string
+          social_links?: Json | null
+        }
+        Relationships: []
+      }
+      speakers: {
+        Row: {
+          bio: string
+          event_id: number | null
+          id: string
+          image: string
+          name: string
+          title: string
+        }
+        Insert: {
+          bio: string
+          event_id?: number | null
+          id?: string
+          image: string
+          name: string
+          title: string
+        }
+        Update: {
+          bio?: string
+          event_id?: number | null
+          id?: string
+          image?: string
+          name?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "speakers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_packages: {
+        Row: {
+          benefits: string[]
+          event_id: number | null
+          id: string
+          name: string
+          price: number
+        }
+        Insert: {
+          benefits?: string[]
+          event_id?: number | null
+          id?: string
+          name: string
+          price: number
+        }
+        Update: {
+          benefits?: string[]
+          event_id?: number | null
+          id?: string
+          name?: string
+          price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_packages_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -18,7 +18,8 @@ import {
   EyeOff,
   Check,
   X,
-  Mail
+  Mail,
+  download
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useEvents } from "@/context/EventContext";
@@ -29,6 +30,7 @@ import EventForm from "@/components/admin/EventForm";
 import DeleteEventDialog from "@/components/admin/DeleteEventDialog";
 import NotificationsPanel from "@/components/admin/NotificationsPanel";
 import { Badge } from "@/components/ui/badge";
+import SpeakerManagementModal from "@/components/admin/SpeakerManagementModal";
 
 const AdminDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("events");
@@ -36,6 +38,8 @@ const AdminDashboard = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isSpeakerModalOpen, setIsSpeakerModalOpen] = useState(false);
+  const [selectedSpeaker, setSelectedSpeaker] = useState<any>(null);
   const location = useLocation();
   
   useEffect(() => {
@@ -174,6 +178,38 @@ const AdminDashboard = () => {
         description: "There was an error deleting the event.",
         variant: "destructive"
       });
+    }
+  };
+
+  const handleExportAttendees = async (eventId: number) => {
+    try {
+      await exportAttendeeList(eventId);
+      toast({
+        title: "Export successful",
+        description: "The attendee list has been downloaded.",
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the attendee list.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleOpenSpeakerModal = (speaker?: any) => {
+    setSelectedSpeaker(speaker);
+    setIsSpeakerModalOpen(true);
+  };
+
+  const handleSpeakerUpdated = () => {
+    const storedEvents = localStorage.getItem("events");
+    if (storedEvents) {
+      try {
+        setEvents(JSON.parse(storedEvents));
+      } catch (error) {
+        console.error("Error parsing stored events:", error);
+      }
     }
   };
 
@@ -401,7 +437,9 @@ const AdminDashboard = () => {
                           size="sm" 
                           className="text-white border-white/10 hover:bg-secondary"
                           disabled={!event.attendees}
+                          onClick={() => handleExportAttendees(event.id)}
                         >
+                          <download className="mr-2 h-4 w-4" />
                           Export Attendee List
                         </Button>
                       </div>
@@ -421,7 +459,10 @@ const AdminDashboard = () => {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-white">Manage Speakers</CardTitle>
-                  <Button className="bg-eventPrimary hover:bg-eventSecondary btn-animated">
+                  <Button 
+                    className="bg-eventPrimary hover:bg-eventSecondary btn-animated"
+                    onClick={() => handleOpenSpeakerModal()}
+                  >
                     <Plus className="mr-1 h-4 w-4" /> Add New Speaker
                   </Button>
                 </div>
@@ -450,11 +491,14 @@ const AdminDashboard = () => {
                                 <p className="font-medium text-white">{speaker.name}</p>
                                 <p className="text-sm text-gray-400">{speaker.title}</p>
                               </div>
-                              <div className="ml-auto flex">
-                                <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20">
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="ml-auto text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                                onClick={() => handleOpenSpeakerModal(speaker)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
                             </div>
                           ))
                       ) : (
@@ -619,6 +663,17 @@ const AdminDashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+      
+      <SpeakerManagementModal
+        isOpen={isSpeakerModalOpen}
+        onClose={() => {
+          setIsSpeakerModalOpen(false);
+          setSelectedSpeaker(null);
+        }}
+        eventId={selectedEvent?.id}
+        speaker={selectedSpeaker}
+        onSpeakerUpdated={handleSpeakerUpdated}
+      />
       
       {showNotifications && (
         <div className="fixed inset-0 z-50 flex justify-end">
