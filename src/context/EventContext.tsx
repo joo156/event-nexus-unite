@@ -1,4 +1,3 @@
-
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { mockEvents } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
@@ -75,6 +74,7 @@ type EventContextType = {
   speakerProposals: SpeakerProposal[];
   addSpeakerProposal: (proposal: Omit<SpeakerProposal, "id" | "createdAt" | "isRead">) => Promise<SpeakerProposal>;
   markProposalAsRead: (id: string) => Promise<boolean>;
+  removeSpeakerProposal: (id: string) => Promise<boolean>;
   toggleEventVisibility: (id: number) => Promise<Event | null>;
 };
 
@@ -93,26 +93,22 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load events from mock data or localStorage if available
     const storedEvents = localStorage.getItem("events");
     if (storedEvents) {
       try {
         const parsedEvents = JSON.parse(storedEvents);
-        // Ensure proper typing with the updated Event type that includes visible property
         const typedEvents: Event[] = parsedEvents.map((event: any) => ({
           ...event,
           isPaid: !!event.price && event.price > 0,
-          visible: event.visible !== false // Default to visible if not specified
+          visible: event.visible !== false
         }));
         setEvents(typedEvents);
       } catch (error) {
         console.error("Error parsing stored events:", error);
-        // Ensure mockEvents has the required fields before setting to state
         const processedMockEvents: Event[] = mockEvents.map((event: any) => ({
           ...event,
           isPaid: !!event.price && event.price > 0,
-          visible: event.visible !== false, // Default to visible if not specified
-          // Convert any numeric speaker IDs to strings to match our type
+          visible: true,
           speakers: event.speakers?.map((speaker: any) => ({
             ...speaker,
             id: String(speaker.id)
@@ -122,12 +118,10 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem("events", JSON.stringify(processedMockEvents));
       }
     } else {
-      // Ensure mockEvents has the required fields before setting to state
       const processedMockEvents: Event[] = mockEvents.map((event: any) => ({
         ...event,
         isPaid: !!event.price && event.price > 0,
         visible: true,
-        // Convert any numeric speaker IDs to strings to match our type
         speakers: event.speakers?.map((speaker: any) => ({
           ...speaker,
           id: String(speaker.id)
@@ -137,7 +131,6 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem("events", JSON.stringify(processedMockEvents));
     }
     
-    // Load speaker proposals if available
     const storedProposals = localStorage.getItem("speakerProposals");
     if (storedProposals) {
       try {
@@ -147,7 +140,6 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     
-    // Load registrations if available
     const storedRegistrations = localStorage.getItem("eventRegistrations");
     if (storedRegistrations) {
       try {
@@ -280,7 +272,6 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         
         saveEvents(updatedEvents);
         
-        // Also remove any registrations for this event
         const updatedRegistrations = registrations.filter(reg => reg.eventId !== id);
         saveRegistrations(updatedRegistrations);
         
@@ -301,7 +292,6 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   const registerForEvent = async (eventId: number, userId: string): Promise<boolean> => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        // Check if already registered
         const alreadyRegistered = registrations.some(
           reg => reg.eventId === eventId && reg.userId === userId
         );
@@ -316,11 +306,9 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
         
-        // Update registrations
         const updatedRegistrations = [...registrations, { eventId, userId }];
         saveRegistrations(updatedRegistrations);
         
-        // Update event attendee count
         const eventIndex = events.findIndex(e => e.id === eventId);
         if (eventIndex !== -1) {
           const updatedEvents = [...events];
@@ -399,6 +387,28 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const removeSpeakerProposal = async (id: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const updatedProposals = speakerProposals.filter(p => p.id !== id);
+        
+        if (updatedProposals.length === speakerProposals.length) {
+          resolve(false);
+          return;
+        }
+        
+        saveSpeakerProposals(updatedProposals);
+        
+        toast({
+          title: "Proposal removed",
+          description: "The speaker proposal has been removed from the list.",
+        });
+        
+        resolve(true);
+      }, 300);
+    });
+  };
+
   return (
     <EventContext.Provider
       value={{
@@ -412,6 +422,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         speakerProposals,
         addSpeakerProposal,
         markProposalAsRead,
+        removeSpeakerProposal,
         toggleEventVisibility
       }}
     >

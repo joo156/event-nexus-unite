@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -53,7 +52,7 @@ const AdminDashboard = () => {
   }, [location]);
   
   const { user } = useAuth();
-  const { events, addEvent, updateEvent, deleteEvent, toggleEventVisibility, speakerProposals, markProposalAsRead } = useEvents();
+  const { events, addEvent, updateEvent, deleteEvent, toggleEventVisibility, speakerProposals, markProposalAsRead, removeSpeakerProposal } = useEvents();
   const { unreadCount, addNotification } = useNotifications();
   const { toast } = useToast();
   const { openModal } = useModal();
@@ -77,15 +76,29 @@ const AdminDashboard = () => {
   
   const handleApproveSpeakerProposal = (proposal: any) => {
     markProposalAsRead(proposal.id);
-    toast({
-      title: "Proposal Approved",
-      description: `${proposal.name} has been approved as a speaker.`,
-    });
-    setIsProposalModalOpen(false);
+    const eventId = selectedEvent ? selectedEvent.id : events[0]?.id;
+    if (eventId) {
+      handleOpenSpeakerModal({
+        name: proposal.name,
+        title: "Speaker",
+        bio: proposal.bio,
+        image: "https://via.placeholder.com/150",
+        id: undefined
+      });
+      removeSpeakerProposal(proposal.id);
+      setIsProposalModalOpen(false);
+    } else {
+      toast({
+        title: "No events available",
+        description: "Please create at least one event to add speakers.",
+        variant: "destructive"
+      });
+    }
   };
   
   const handleRejectSpeakerProposal = (proposal: any) => {
     markProposalAsRead(proposal.id);
+    removeSpeakerProposal(proposal.id);
     toast({
       title: "Proposal Rejected",
       description: `${proposal.name}'s proposal has been rejected.`,
@@ -200,13 +213,14 @@ const AdminDashboard = () => {
   };
 
   const handleOpenSpeakerModal = (speaker?: any) => {
+    if (!selectedEvent && !speaker && events.length > 0) {
+      setSelectedEvent(events[0]);
+    }
     setSelectedSpeaker(speaker);
     setIsSpeakerModalOpen(true);
   };
 
   const handleSpeakerUpdated = () => {
-    // Refresh events data to show updated speakers
-    // No need to manually set events as the context will handle this
     toast({
       title: "Success",
       description: "Speaker data has been updated successfully."

@@ -67,7 +67,12 @@ export default function SpeakerManagementModal({
         // Update existing speaker
         const { error } = await supabase
           .from('speakers')
-          .update(data)
+          .update({
+            name: data.name,
+            title: data.title,
+            bio: data.bio,
+            image: data.image
+          })
           .eq('id', speaker.id);
 
         if (error) throw error;
@@ -80,7 +85,13 @@ export default function SpeakerManagementModal({
         // Create new speaker
         const { error } = await supabase
           .from('speakers')
-          .insert([{ ...data, event_id: eventId }]);
+          .insert({
+            name: data.name,
+            title: data.title,
+            bio: data.bio,
+            image: data.image,
+            event_id: eventId
+          });
 
         if (error) throw error;
         
