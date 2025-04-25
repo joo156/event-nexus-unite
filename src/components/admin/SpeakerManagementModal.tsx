@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -58,10 +59,14 @@ export default function SpeakerManagementModal({
   });
 
   const { events } = useEvents();
-  const [selectedEventId, setSelectedEventId] = React.useState(eventId || events[0]?.id);
+  // Fix: manage event ID as string for use in select
+  const [selectedEventId, setSelectedEventId] = React.useState(
+    (eventId ? String(eventId) : (events?.[0]?.id ? String(events[0].id) : ""))
+  );
 
   const onSubmit = async (data: SpeakerFormData) => {
-    const eventForSpeaker = selectedEventId || eventId || events[0]?.id;
+    // use number for insert
+    const eventForSpeaker = selectedEventId ? parseInt(selectedEventId, 10) : (eventId || events[0]?.id);
     if (!eventForSpeaker) {
       toast({ title: "No event selected", description: "Please select an event", variant: "destructive" });
       return;
@@ -212,7 +217,7 @@ export default function SpeakerManagementModal({
                 </SelectTrigger>
                 <SelectContent>
                   {events.map(ev => (
-                    <SelectItem key={ev.id} value={ev.id}>
+                    <SelectItem key={ev.id} value={String(ev.id)}>
                       {ev.title}
                     </SelectItem>
                   ))}

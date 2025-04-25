@@ -10,8 +10,14 @@ import * as z from "zod";
 import { useAuth } from "@/context/AuthContext";
 import HeroSection from "@/components/common/HeroSection";
 import { Mail, Key } from "lucide-react";
-import { Google, Apple } from "lucide-react";
+import { icons } from "lucide-react";
+import { Apple } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+
+const LucideIcon = ({ name, ...props }: { name: keyof typeof icons, [key: string]: any }) => {
+  const Icon = icons[name];
+  return Icon ? <Icon {...props} /> : null;
+};
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -87,7 +93,7 @@ const SignIn = () => {
         <div className="glass-card p-8">
           <div className="flex gap-2 mb-4">
             <Button type="button" className="w-full flex items-center justify-center gap-2 bg-white text-black border" onClick={handleGoogleLogin}>
-              <Google className="h-5 w-5" /> Continue with Google
+              <LucideIcon name="google" className="h-5 w-5" /> Continue with Google
             </Button>
             <Button type="button" className="w-full flex items-center justify-center gap-2 bg-black text-white border" onClick={handleAppleLogin}>
               <Apple className="h-5 w-5" /> Continue with Apple
