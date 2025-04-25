@@ -1,4 +1,3 @@
-
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -9,6 +8,7 @@ type User = {
   name: string;
   role: string;
   avatar?: string;
+  login_method?: string;
 };
 
 type AuthContextType = {
@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is logged in
     const authUser = localStorage.getItem("authUser");
     if (authUser) {
       try {
@@ -53,14 +52,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string, rememberMe = false): Promise<boolean> => {
     return new Promise((resolve) => {
-      // Mock authentication
       setTimeout(() => {
-        if (email === "admin@eventnexus.com" && password === "password123") {
+        if (email === "admin@eventnexue.com" && password === "password123") {
           const adminUser = { 
             id: "admin-1",
-            email: email,
+            email,
             role: "admin",
-            name: "Admin User" 
+            name: "Admin User",
+            login_method: "email"
           };
           
           localStorage.setItem("authUser", JSON.stringify(adminUser));
@@ -74,13 +73,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           
           resolve(true);
         } else {
-          // Check if it's a regular user (mock)
           if (email.includes("@") && password.length >= 8) {
             const regularUser = { 
               id: `user-${Date.now()}`,
               email: email,
               role: "user",
-              name: "Regular User"
+              name: "Regular User",
+              login_method: "email"
             };
             
             localStorage.setItem("authUser", JSON.stringify(regularUser));
@@ -115,6 +114,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           email: userData.email,
           name: userData.name,
           role: "user",
+          login_method: "email"
         };
         
         localStorage.setItem("authUser", JSON.stringify(newUser));

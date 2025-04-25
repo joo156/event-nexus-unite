@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -11,6 +10,8 @@ import * as z from "zod";
 import { useAuth } from "@/context/AuthContext";
 import HeroSection from "@/components/common/HeroSection";
 import { User, Mail, Phone, Key } from "lucide-react";
+import { Google, Apple } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -28,7 +29,6 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { register, isAuthenticated } = useAuth();
   
-  // If already logged in, redirect
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
@@ -67,15 +67,41 @@ const SignUp = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+    if (error) {
+      console.error("Google OAuth error:", error);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+    });
+    if (error) {
+      console.error("Apple OAuth error:", error);
+    }
+  };
+
   return (
     <Layout>
       <HeroSection
         title="Create Your Account"
-        subtitle="Join eventNexus to discover and attend amazing virtual events"
+        subtitle="Join EventNexue to discover and attend amazing virtual events"
       />
       
       <div className="container mx-auto py-12 max-w-md">
         <div className="glass-card p-8">
+          <div className="flex gap-2 mb-4">
+            <Button type="button" className="w-full flex items-center justify-center gap-2 bg-white text-black border" onClick={handleGoogleLogin}>
+              <Google className="h-5 w-5" /> Continue with Google
+            </Button>
+            <Button type="button" className="w-full flex items-center justify-center gap-2 bg-black text-white border" onClick={handleAppleLogin}>
+              <Apple className="h-5 w-5" /> Continue with Apple
+            </Button>
+          </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField

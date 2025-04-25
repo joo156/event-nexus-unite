@@ -1,13 +1,10 @@
 
+// Merge filter logic: one button, unified panel.
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import { Search, Filter } from 'lucide-react';
 
@@ -17,6 +14,9 @@ interface EventFiltersProps {
     category: string;
     date: string;
     location: string;
+    eventType?: string;
+    price?: string;
+    speaker?: string;
   }) => void;
 }
 
@@ -25,15 +25,15 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
   const [category, setCategory] = useState("");
   const [date, setDate] = useState("");
   const [location, setLocation] = useState("");
+  const [eventType, setEventType] = useState("");
+  const [price, setPrice] = useState("");
+  const [speaker, setSpeaker] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onFilterChange({
-      search,
-      category,
-      date,
-      location
+      search, category, date, location, eventType, price, speaker
     });
   };
 
@@ -42,11 +42,11 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
     setCategory("");
     setDate("");
     setLocation("");
+    setEventType("");
+    setPrice("");
+    setSpeaker("");
     onFilterChange({
-      search: "",
-      category: "",
-      date: "",
-      location: ""
+      search: "", category: "", date: "", location: "", eventType: "", price: "", speaker: ""
     });
   };
 
@@ -64,33 +64,25 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
-          
-          <Button 
-            type="button" 
-            variant="outline" 
+          <Button
+            type="button"
+            variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className="md:w-auto w-full flex items-center gap-2"
           >
             <Filter className="h-4 w-4" />
             {showFilters ? "Hide Filters" : "Show Filters"}
           </Button>
-          
-          <Button 
-            type="submit" 
-            className="bg-eventPrimary hover:bg-eventSecondary md:w-auto w-full"
-          >
+          <Button type="submit" className="bg-eventPrimary hover:bg-eventSecondary md:w-auto w-full">
             Search
           </Button>
         </div>
-        
         {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            {/* Expanded filter options grouped here */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Category</label>
-              <Select
-                value={category}
-                onValueChange={setCategory}
-              >
+              <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger className="input-primary">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
@@ -104,13 +96,46 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
                 </SelectContent>
               </Select>
             </div>
-            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Event Type</label>
+              <Select value={eventType} onValueChange={setEventType}>
+                <SelectTrigger className="input-primary">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="virtual">Virtual</SelectItem>
+                  <SelectItem value="hybrid">Hybrid</SelectItem>
+                  <SelectItem value="in-person">In-person</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Price</label>
+              <Select value={price} onValueChange={setPrice}>
+                <SelectTrigger className="input-primary">
+                  <SelectValue placeholder="Free or Paid" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="free">Free</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Speaker</label>
+              <Input
+                type="text"
+                placeholder="Speaker name"
+                value={speaker}
+                onChange={(e) => setSpeaker(e.target.value)}
+                className="input-primary"
+              />
+            </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Date</label>
-              <Select
-                value={date}
-                onValueChange={setDate}
-              >
+              <Select value={date} onValueChange={setDate}>
                 <SelectTrigger className="input-primary">
                   <SelectValue placeholder="Any Date" />
                 </SelectTrigger>
@@ -124,13 +149,9 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
                 </SelectContent>
               </Select>
             </div>
-            
             <div className="space-y-2">
               <label className="text-sm font-medium">Location</label>
-              <Select
-                value={location}
-                onValueChange={setLocation}
-              >
+              <Select value={location} onValueChange={setLocation}>
                 <SelectTrigger className="input-primary">
                   <SelectValue placeholder="Any Location" />
                 </SelectTrigger>
@@ -142,11 +163,10 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
                 </SelectContent>
               </Select>
             </div>
-            
-            <div className="md:col-span-3 flex justify-end">
-              <Button 
-                type="button" 
-                variant="ghost" 
+            <div className="md:col-span-4 flex justify-end">
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={handleReset}
                 className="text-gray-500"
               >
@@ -159,5 +179,4 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
     </div>
   );
 };
-
 export default EventFilters;

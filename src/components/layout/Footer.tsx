@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +11,7 @@ const Footer = () => {
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 px-4 py-12">
           <div>
-            <h3 className="text-xl font-bold mb-4 text-gradient">eventNexus</h3>
+            <h3 className="text-xl font-bold mb-4 text-gradient">EventNexue</h3>
             <p className="text-gray-300 mb-6">
               Your premier platform for discovering, attending, and managing virtual and hybrid events.
             </p>
@@ -71,7 +70,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-800 py-6 text-center text-gray-400">
-          <p>&copy; {currentYear} eventNexus. All rights reserved.</p>
+          <p>&copy; {currentYear} EventNexue. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export const exportAttendeeList = async (eventId: number) => {
@@ -9,7 +8,8 @@ export const exportAttendeeList = async (eventId: number) => {
       events (title),
       profiles:user_id (
         name,
-        id
+        id,
+        email
       )
     `)
     .eq('event_id', eventId);
@@ -22,14 +22,19 @@ export const exportAttendeeList = async (eventId: number) => {
   const csvData = registrations.map((reg: any) => ({
     name: reg.profiles?.name || 'Anonymous',
     userId: reg.profiles?.id || 'N/A',
+    email: reg.profiles?.email || 'N/A',
     event: reg.events?.title || 'N/A',
+    registrationDate: reg.created_at || "",
+    paymentStatus: reg.payment_status || 'N/A',
   }));
 
   // Convert to CSV
-  const headers = ['Name', 'User ID', 'Event'];
+  const headers = ['Name', 'User ID', 'Email', 'Event', 'Registration Date', 'Payment Status'];
   const csv = [
     headers.join(','),
-    ...csvData.map(row => [row.name, row.userId, row.event].join(','))
+    ...csvData.map(row =>
+      [row.name, row.userId, row.email, row.event, row.registrationDate, row.paymentStatus].join(',')
+    )
   ].join('\n');
 
   // Create and trigger download

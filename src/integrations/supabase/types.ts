@@ -70,18 +70,21 @@ export type Database = {
         Row: {
           avatar: string | null
           id: string
+          login_method: string | null
           name: string | null
           role: string | null
         }
         Insert: {
           avatar?: string | null
           id: string
+          login_method?: string | null
           name?: string | null
           role?: string | null
         }
         Update: {
           avatar?: string | null
           id?: string
+          login_method?: string | null
           name?: string | null
           role?: string | null
         }
@@ -92,18 +95,21 @@ export type Database = {
           created_at: string | null
           event_id: number
           id: string
+          payment_status: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
           event_id: number
           id?: string
+          payment_status?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
           event_id?: number
           id?: string
+          payment_status?: string | null
           user_id?: string
         }
         Relationships: [
@@ -160,6 +166,7 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
+          is_deleted: boolean | null
           is_read: boolean | null
           name: string
           social_links: Json | null
@@ -169,6 +176,7 @@ export type Database = {
           created_at?: string | null
           email: string
           id?: string
+          is_deleted?: boolean | null
           is_read?: boolean | null
           name: string
           social_links?: Json | null
@@ -178,6 +186,7 @@ export type Database = {
           created_at?: string | null
           email?: string
           id?: string
+          is_deleted?: boolean | null
           is_read?: boolean | null
           name?: string
           social_links?: Json | null
@@ -187,26 +196,32 @@ export type Database = {
       speakers: {
         Row: {
           bio: string
+          email: string | null
           event_id: number | null
           id: string
           image: string
           name: string
+          social_links: Json | null
           title: string
         }
         Insert: {
           bio: string
+          email?: string | null
           event_id?: number | null
           id?: string
           image: string
           name: string
+          social_links?: Json | null
           title: string
         }
         Update: {
           bio?: string
+          email?: string | null
           event_id?: number | null
           id?: string
           image?: string
           name?: string
+          social_links?: Json | null
           title?: string
         }
         Relationships: [
