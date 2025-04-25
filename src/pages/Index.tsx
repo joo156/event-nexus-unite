@@ -10,6 +10,7 @@ import { useEvents } from "@/context/EventContext";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import LiveDemoBanner from "@/components/common/LiveDemoBanner";
+import LiveNowTape from "@/components/common/LiveNowTape";
 
 const Index = () => {
   const { events } = useEvents();
@@ -82,10 +83,9 @@ const Index = () => {
       />
 
       {liveEvent && isLiveEventOngoing && (
-        <LiveDemoBanner
+        <LiveNowTape
           eventId={liveEvent.id}
-          title={liveEvent.title}
-          description="Join our ongoing free event and experience EventNexue in action – live sessions, real-time chat, and more."
+          message="A Live Event is happening now! Join instantly ➤"
         />
       )}
 

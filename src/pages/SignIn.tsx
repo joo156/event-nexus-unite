@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -10,14 +11,6 @@ import * as z from "zod";
 import { useAuth } from "@/context/AuthContext";
 import HeroSection from "@/components/common/HeroSection";
 import { Mail, Key } from "lucide-react";
-import { icons } from "lucide-react";
-import { Apple } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-
-const LucideIcon = ({ name, ...props }: { name: keyof typeof icons, [key: string]: any }) => {
-  const Icon = icons[name];
-  return Icon ? <Icon {...props} /> : null;
-};
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -64,24 +57,6 @@ const SignIn = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
-    if (error) {
-      console.error("Google OAuth error:", error);
-    }
-  };
-
-  const handleAppleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-    });
-    if (error) {
-      console.error("Apple OAuth error:", error);
-    }
-  };
-
   return (
     <Layout>
       <HeroSection
@@ -91,14 +66,7 @@ const SignIn = () => {
       
       <div className="container mx-auto py-12 max-w-md">
         <div className="glass-card p-8">
-          <div className="flex gap-2 mb-4">
-            <Button type="button" className="w-full flex items-center justify-center gap-2 bg-white text-black border" onClick={handleGoogleLogin}>
-              <LucideIcon name="google" className="h-5 w-5" /> Continue with Google
-            </Button>
-            <Button type="button" className="w-full flex items-center justify-center gap-2 bg-black text-white border" onClick={handleAppleLogin}>
-              <Apple className="h-5 w-5" /> Continue with Apple
-            </Button>
-          </div>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -171,7 +139,7 @@ const SignIn = () => {
               
               <Button 
                 type="submit" 
-                className="w-full bg-eventPrimary hover:bg-eventSecondary btn-animated"
+                className="w-full btn-primary btn-animated"
                 disabled={isLoading}
               >
                 {isLoading ? "Signing in..." : "Sign In"}
