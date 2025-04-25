@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string, rememberMe = false): Promise<boolean> => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        if (email === "admin@eventnexue.com" && password === "password123") {
+        if (email === "admin@eventnexus.com" && password === "password123") {
           const adminUser = { 
             id: "admin-1",
             email,
@@ -61,16 +61,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             name: "Admin User",
             login_method: "email"
           };
-          
+
           localStorage.setItem("authUser", JSON.stringify(adminUser));
           setUser(adminUser);
           setIsAuthenticated(true);
-          
+
           toast({
             title: "Login successful",
             description: "Welcome back, Admin!",
           });
-          
+
           resolve(true);
         } else {
           if (email.includes("@") && password.length >= 8) {
@@ -204,3 +204,5 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     </AuthContext.Provider>
   );
 };
+
+export { useAuth, AuthProvider };
