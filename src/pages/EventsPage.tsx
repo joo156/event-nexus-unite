@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import HeroSection from "@/components/common/HeroSection";
@@ -33,12 +34,14 @@ const EventsPage = () => {
   const eventsPerPage = 9;
   
   useEffect(() => {
+    // Update filtered events whenever the events list changes (e.g., from admin updates)
     setFilteredEvents(events.filter(e => e.visible !== false));
   }, [events]);
 
+  // Find the live demo event if exists
   const liveEvent = events.find(event => event.id === 99999);
   const isLiveEventSoon = liveEvent && new Date(liveEvent.date + " " + liveEvent.time) > new Date();
-
+  
   const handleFilterChange = (filters: any) => {
     let filtered = [...events].filter(e => e.visible !== false);
 
@@ -105,6 +108,7 @@ const EventsPage = () => {
     setShowFiltersDialog(false);
   };
 
+  // Calculate pagination
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
@@ -135,6 +139,7 @@ const EventsPage = () => {
             </Button>
           </div>
 
+          {/* Live Event Banner (if available) */}
           {liveEvent && isLiveEventSoon && (
             <div className="mb-8 bg-gradient-to-r from-red-600 to-pink-600 rounded-lg p-4 shadow-lg">
               <div className="flex flex-wrap items-center justify-between">
@@ -193,6 +198,7 @@ const EventsPage = () => {
             )}
           </div>
 
+          {/* Pagination */}
           {filteredEvents.length > eventsPerPage && (
             <div className="flex justify-center mt-12">
               <div className="flex space-x-1">
@@ -232,6 +238,7 @@ const EventsPage = () => {
         </div>
       </section>
 
+      {/* Advanced Filters Dialog */}
       <Dialog open={showFiltersDialog} onOpenChange={setShowFiltersDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

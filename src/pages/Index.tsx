@@ -9,8 +9,6 @@ import { ChevronRight } from "lucide-react";
 import { useEvents } from "@/context/EventContext";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import LiveDemoBanner from "@/components/common/LiveDemoBanner";
-import LiveNowTape from "@/components/common/LiveNowTape";
 
 const Index = () => {
   const { events } = useEvents();
@@ -56,13 +54,7 @@ const Index = () => {
   };
 
   const liveEvent = events.find(event => event.id === 99999);
-  const isLiveEventOngoing =
-    liveEvent &&
-    (() => {
-      const now = new Date();
-      const eventDate = new Date(liveEvent.date + " " + liveEvent.time);
-      return eventDate < now && now < new Date(eventDate.getTime() + 2 * 60 * 60 * 1000);
-    })();
+  const isLiveEventSoon = liveEvent && new Date(liveEvent.date + " " + liveEvent.time) > new Date();
 
   const featuredEvents = filteredEvents.filter(event => event.featured || event.id === 99999).slice(0, 6);
   const recentEvents = filteredEvents.slice(0, 3);
@@ -82,11 +74,37 @@ const Index = () => {
         bgImage="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80"
       />
 
-      {liveEvent && isLiveEventOngoing && (
-        <LiveNowTape
-          eventId={liveEvent.id}
-          message="A Live Event is happening now! Join instantly ➤"
-        />
+      {liveEvent && isLiveEventSoon && (
+        <div className="container mx-auto mt-6 mb-0">
+          <div className="bg-gradient-to-r from-red-600 to-pink-600 rounded-lg p-4 shadow-lg">
+            <div className="flex flex-wrap items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="absolute -top-1 -left-1">
+                    <Badge variant="destructive" className="animate-pulse flex gap-1 items-center">
+                      <span className="h-2 w-2 rounded-full bg-white"></span>
+                      LIVE
+                    </Badge>
+                  </div>
+                  <img 
+                    src={liveEvent.image} 
+                    alt={liveEvent.title} 
+                    className="h-16 w-16 rounded object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-white text-lg font-bold">{liveEvent.title}</h3>
+                  <p className="text-white/80 text-sm">Starting soon - Join now!</p>
+                </div>
+              </div>
+              <Link to={`/live/${liveEvent.id}`}>
+                <Button className="bg-white text-red-600 hover:bg-gray-100">
+                  Join Live Event
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
       )}
 
       <section className="section-padding">

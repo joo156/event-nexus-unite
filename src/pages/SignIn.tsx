@@ -24,9 +24,11 @@ const SignIn = () => {
   const location = useLocation();
   const { login, isAuthenticated } = useAuth();
   
+  // Get redirect path from URL query params
   const searchParams = new URLSearchParams(location.search);
   const redirectPath = searchParams.get('redirect') || '/';
   
+  // If already logged in, redirect
   useEffect(() => {
     if (isAuthenticated) {
       navigate(redirectPath);
@@ -66,7 +68,6 @@ const SignIn = () => {
       
       <div className="container mx-auto py-12 max-w-md">
         <div className="glass-card p-8">
-
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -74,15 +75,15 @@ const SignIn = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-gray-300">Email</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input 
                           placeholder="your@email.com" 
-                          className="input-primary pl-10" 
+                          className="dark-input pl-10" 
                           {...field} 
                         />
-                        <Mail className="absolute left-3 top-2.5 h-5 w-5 text-eventPrimary" />
+                        <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -95,16 +96,16 @@ const SignIn = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel className="text-gray-300">Password</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input 
                           type="password" 
                           placeholder="••••••••" 
-                          className="input-primary pl-10" 
+                          className="dark-input pl-10" 
                           {...field} 
                         />
-                        <Key className="absolute left-3 top-2.5 h-5 w-5 text-eventPrimary" />
+                        <Key className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -125,7 +126,7 @@ const SignIn = () => {
                         checked={field.value}
                         onChange={field.onChange}
                       />
-                      <label htmlFor="remember-me" className="text-sm text-gray-300">
+                      <label htmlFor="remember-me" className="text-sm text-gray-400">
                         Remember me
                       </label>
                     </div>
@@ -139,14 +140,14 @@ const SignIn = () => {
               
               <Button 
                 type="submit" 
-                className="w-full btn-primary btn-animated"
+                className="w-full bg-eventPrimary hover:bg-eventSecondary btn-animated"
                 disabled={isLoading}
               >
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
               
               <div className="text-center mt-4">
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-gray-400">
                   Don't have an account?{" "}
                   <Link to="/signup" className="text-eventPrimary hover:underline">
                     Sign up
@@ -155,9 +156,9 @@ const SignIn = () => {
               </div>
 
               <div className="border-t border-white/10 pt-6 text-center">
-                <p className="text-xs text-gray-300 mb-2">Demo Credentials</p>
-                <p className="text-xs text-gray-300">Admin: admin@eventnexus.com / password123</p>
-                <p className="text-xs text-gray-300">User: user@example.com / password123</p>
+                <p className="text-xs text-gray-500 mb-2">Demo Credentials</p>
+                <p className="text-xs text-gray-400">Admin: admin@eventnexus.com / password123</p>
+                <p className="text-xs text-gray-400">User: user@example.com / password123</p>
               </div>
             </form>
           </Form>

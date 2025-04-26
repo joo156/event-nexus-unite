@@ -11,7 +11,6 @@ import { AuthProvider } from "./context/AuthContext";
 
 // Pages
 import Index from "./pages/Index";
-import HomePage from "./pages/HomePage";
 import EventsPage from "./pages/EventsPage";
 import EventDetails from "./pages/EventDetails";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -115,7 +114,7 @@ const AppContent = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<Index />} />
       <Route path="/events" element={<EventsPage />} />
       <Route path="/events/:id" element={<EventDetails />} />
       <Route path="/become-speaker" element={<BecomeASpeaker />} />

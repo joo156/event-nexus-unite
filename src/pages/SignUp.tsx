@@ -28,6 +28,7 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { register, isAuthenticated } = useAuth();
   
+  // If already logged in, redirect
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
@@ -70,7 +71,7 @@ const SignUp = () => {
     <Layout>
       <HeroSection
         title="Create Your Account"
-        subtitle="Join EventNexue to discover and attend amazing virtual events"
+        subtitle="Join eventNexus to discover and attend amazing virtual events"
       />
       
       <div className="container mx-auto py-12 max-w-md">
@@ -186,7 +187,7 @@ const SignUp = () => {
               
               <Button 
                 type="submit" 
-                className="w-full btn-primary btn-animated"
+                className="w-full bg-eventPrimary hover:bg-eventSecondary btn-animated"
                 disabled={isLoading}
               >
                 {isLoading ? "Creating Account..." : "Sign Up"}

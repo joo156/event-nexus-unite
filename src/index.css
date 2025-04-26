@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
@@ -8,8 +9,12 @@
   :root {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
+    
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
 
     --primary: 252 83% 75%;
     --primary-foreground: 240 5.9% 10%;
@@ -22,6 +27,7 @@
 
     --accent: 270 100% 92%;
     --accent-foreground: 240 5.9% 10%;
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
@@ -87,25 +93,7 @@
 }
 
 .text-gradient {
-  background-image: linear-gradient(90deg, #9b87f5, #221F26, #1EAEDB);
-  color: transparent;
-  background-clip: text;
-  -webkit-background-clip: text;
-}
-.text-eventNexue {
-  color: #9b87f5;
-}
-.bg-eventNexue {
-  background: linear-gradient(90deg, #9b87f5 0%, #1EAEDB 100%);
-}
-.btn-primary {
-  @apply bg-eventPrimary hover:bg-eventSecondary text-white font-medium px-6 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg;
-}
-.btn-primary-live {
-  @apply bg-gradient-to-r from-red-500 via-pink-500 to-eventPrimary text-white font-medium px-6 py-2 rounded-lg shadow-lg animate-pulse;
-}
-.section-brand {
-  @apply bg-eventDark text-white;
+  @apply bg-gradient-to-r from-eventPrimary to-eventSecondary text-transparent bg-clip-text;
 }
 
 /* Animation classes */
