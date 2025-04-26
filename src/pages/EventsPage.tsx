@@ -6,42 +6,19 @@ import EventCard from "@/components/events/EventCard";
 import EventFilters from "@/components/events/EventFilters";
 import { Button } from "@/components/ui/button";
 import { useEvents } from "@/context/EventContext";
-import { formatDistanceToNow } from "date-fns";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogTitle, 
-  DialogHeader,
-  DialogDescription,
-  DialogFooter
-} from "@/components/ui/dialog";
+import { Calendar, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Filter, X, Check } from "lucide-react";
 
 const EventsPage = () => {
   const { events } = useEvents();
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredEvents, setFilteredEvents] = useState(events.filter(e => e.visible !== false));
-  const [showFiltersDialog, setShowFiltersDialog] = useState(false);
-  const [filters, setFilters] = useState({
-    search: "",
-    category: "",
-    location: "",
-    isPaid: null as boolean | null,
-    startDate: null as Date | null,
-    endDate: null as Date | null
-  });
   const eventsPerPage = 9;
   
   useEffect(() => {
-    // Update filtered events whenever the events list changes (e.g., from admin updates)
     setFilteredEvents(events.filter(e => e.visible !== false));
   }, [events]);
 
-  // Find the live demo event if exists
-  const liveEvent = events.find(event => event.id === 99999);
-  const isLiveEventSoon = liveEvent && new Date(liveEvent.date + " " + liveEvent.time) > new Date();
-  
   const handleFilterChange = (filters: any) => {
     let filtered = [...events].filter(e => e.visible !== false);
 
@@ -72,40 +49,8 @@ const EventsPage = () => {
       filtered = filtered.filter(event => !event.isPaid);
     }
 
-    if (filters.startDate) {
-      filtered = filtered.filter(event => {
-        const eventDate = new Date(event.date);
-        return eventDate >= filters.startDate!;
-      });
-    }
-
-    if (filters.endDate) {
-      filtered = filtered.filter(event => {
-        const eventDate = new Date(event.date);
-        return eventDate <= filters.endDate!;
-      });
-    }
-
     setFilteredEvents(filtered);
     setCurrentPage(1);
-  };
-
-  const applyFilters = () => {
-    handleFilterChange(filters);
-    setShowFiltersDialog(false);
-  };
-
-  const resetFilters = () => {
-    setFilters({
-      search: "",
-      category: "",
-      location: "",
-      isPaid: null,
-      startDate: null,
-      endDate: null
-    });
-    setFilteredEvents(events.filter(e => e.visible !== false));
-    setShowFiltersDialog(false);
   };
 
   // Calculate pagination
@@ -115,6 +60,10 @@ const EventsPage = () => {
   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // Find the live demo event if exists
+  const liveEvent = events.find(event => event.id === 99999);
+  const isLiveEventSoon = liveEvent && new Date(liveEvent.date + " " + liveEvent.time) > new Date();
 
   return (
     <Layout>
@@ -128,15 +77,6 @@ const EventsPage = () => {
         <div className="container mx-auto">
           <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
             <EventFilters onFilterChange={handleFilterChange} />
-            
-            <Button 
-              onClick={() => setShowFiltersDialog(true)} 
-              variant="outline" 
-              className="flex items-center gap-2"
-            >
-              <Filter className="h-4 w-4" />
-              Advanced Filters
-            </Button>
           </div>
 
           {/* Live Event Banner (if available) */}
@@ -237,74 +177,6 @@ const EventsPage = () => {
           )}
         </div>
       </section>
-
-      {/* Advanced Filters Dialog */}
-      <Dialog open={showFiltersDialog} onOpenChange={setShowFiltersDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Advanced Filters</DialogTitle>
-            <DialogDescription>
-              Filter events by specific criteria
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-1 block">Event Type</label>
-                <div className="flex space-x-2">
-                  <Button 
-                    variant={filters.isPaid === true ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setFilters({...filters, isPaid: true})}
-                  >
-                    Paid
-                  </Button>
-                  <Button 
-                    variant={filters.isPaid === false ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setFilters({...filters, isPaid: false})}
-                  >
-                    Free
-                  </Button>
-                  <Button 
-                    variant={filters.isPaid === null ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setFilters({...filters, isPaid: null})}
-                  >
-                    All
-                  </Button>
-                </div>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-1 block">Category</label>
-                <div className="flex flex-wrap gap-2">
-                  {['Technology', 'Business', 'Design', 'Marketing', 'Live'].map(category => (
-                    <Button 
-                      key={category}
-                      variant={filters.category === category ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setFilters({...filters, category: filters.category === category ? '' : category})}
-                    >
-                      {category}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <DialogFooter className="flex justify-between">
-            <Button variant="outline" onClick={resetFilters}>
-              <X className="h-4 w-4 mr-1" /> Reset
-            </Button>
-            <Button onClick={applyFilters}>
-              <Check className="h-4 w-4 mr-1" /> Apply Filters
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </Layout>
   );
 };

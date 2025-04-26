@@ -17,6 +17,7 @@ interface EventFiltersProps {
     category: string;
     date: string;
     location: string;
+    isPaid: boolean | null;
   }) => void;
 }
 
@@ -25,6 +26,7 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
   const [category, setCategory] = useState("");
   const [date, setDate] = useState("");
   const [location, setLocation] = useState("");
+  const [isPaid, setIsPaid] = useState<boolean | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -33,7 +35,8 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
       search,
       category,
       date,
-      location
+      location,
+      isPaid
     });
   };
 
@@ -42,11 +45,13 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
     setCategory("");
     setDate("");
     setLocation("");
+    setIsPaid(null);
     onFilterChange({
       search: "",
       category: "",
       date: "",
-      location: ""
+      location: "",
+      isPaid: null
     });
   };
 
@@ -96,11 +101,11 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">All Categories</SelectItem>
-                  <SelectItem value="business">Business</SelectItem>
-                  <SelectItem value="technology">Technology</SelectItem>
-                  <SelectItem value="health">Health</SelectItem>
-                  <SelectItem value="education">Education</SelectItem>
-                  <SelectItem value="entertainment">Entertainment</SelectItem>
+                  <SelectItem value="Technology">Technology</SelectItem>
+                  <SelectItem value="Business">Business</SelectItem>
+                  <SelectItem value="Design">Design</SelectItem>
+                  <SelectItem value="Marketing">Marketing</SelectItem>
+                  <SelectItem value="Live">Live</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -141,6 +146,28 @@ const EventFilters = ({ onFilterChange }: EventFiltersProps) => {
                   <SelectItem value="in-person">In-person</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Event Type</label>
+              <div className="flex space-x-2">
+                <Button 
+                  type="button"
+                  variant={isPaid === true ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setIsPaid(isPaid === true ? null : true)}
+                >
+                  Paid
+                </Button>
+                <Button 
+                  type="button"
+                  variant={isPaid === false ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setIsPaid(isPaid === false ? null : false)}
+                >
+                  Free
+                </Button>
+              </div>
             </div>
             
             <div className="md:col-span-3 flex justify-end">
