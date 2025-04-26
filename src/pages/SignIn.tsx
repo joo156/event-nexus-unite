@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -73,7 +74,7 @@ const SignIn = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-800">Email</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input 
@@ -94,7 +95,7 @@ const SignIn = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-800">Password</FormLabel>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input 
@@ -124,7 +125,7 @@ const SignIn = () => {
                         checked={field.value}
                         onChange={field.onChange}
                       />
-                      <label htmlFor="remember-me" className="text-sm text-gray-500">
+                      <label htmlFor="remember-me" className="text-sm text-gray-300">
                         Remember me
                       </label>
                     </div>
@@ -145,7 +146,7 @@ const SignIn = () => {
               </Button>
               
               <div className="text-center mt-4">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-300">
                   Don't have an account?{" "}
                   <Link to="/signup" className="text-eventPrimary hover:underline">
                     Sign up
@@ -154,9 +155,9 @@ const SignIn = () => {
               </div>
 
               <div className="border-t border-white/10 pt-6 text-center">
-                <p className="text-xs text-gray-400 mb-2">Demo Credentials</p>
-                <p className="text-xs text-gray-600">Admin: admin@eventnexus.com / password123</p>
-                <p className="text-xs text-gray-600">User: user@example.com / password123</p>
+                <p className="text-xs text-gray-300 mb-2">Demo Credentials</p>
+                <p className="text-xs text-gray-300">Admin: admin@eventnexus.com / password123</p>
+                <p className="text-xs text-gray-300">User: user@example.com / password123</p>
               </div>
             </form>
           </Form>
