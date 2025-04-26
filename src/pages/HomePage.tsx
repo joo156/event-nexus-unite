@@ -4,16 +4,11 @@ import Layout from "@/components/layout/Layout";
 import LiveEventTape from "@/components/events/LiveEventTape";
 import LiveDemoBanner from "@/components/common/LiveDemoBanner";
 
-// Import the original Index component content
-// Since we can't import the Index component directly (it's in read-only files),
-// we'll recreate the essential parts and add our LiveEventTape
-
 const HomePage = () => {
   const [hasLiveEvent, setHasLiveEvent] = useState(false);
   const [liveEventId, setLiveEventId] = useState<number | null>(null);
   
   useEffect(() => {
-    // Check if there's a live event
     const storedEvents = localStorage.getItem("events");
     if (storedEvents) {
       try {
@@ -33,6 +28,10 @@ const HomePage = () => {
     <Layout>
       {hasLiveEvent && liveEventId && (
         <div className="container mx-auto px-4 mt-6">
+          <LiveEventTape
+            eventId={liveEventId}
+            message="Live Event Happening Now! Click to join"
+          />
           <LiveDemoBanner
             eventId={liveEventId}
             title="Live Demo Event"
@@ -41,8 +40,6 @@ const HomePage = () => {
         </div>
       )}
       
-      {/* We would include the original Index content here */}
-      {/* Since we can't directly copy it, we're implementing a placeholder that points to the original page */}
       <iframe 
         src="/" 
         style={{ 
