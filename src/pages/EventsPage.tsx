@@ -6,8 +6,7 @@ import EventCard from "@/components/events/EventCard";
 import EventFilters from "@/components/events/EventFilters";
 import { Button } from "@/components/ui/button";
 import { useEvents } from "@/context/EventContext";
-import { Calendar, Clock } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import LiveEventTape from "@/components/events/LiveEventTape";
 
 const EventsPage = () => {
   const { events } = useEvents();
@@ -61,10 +60,6 @@ const EventsPage = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  // Find the live demo event if exists
-  const liveEvent = events.find(event => event.id === 99999);
-  const isLiveEventSoon = liveEvent && new Date(liveEvent.date + " " + liveEvent.time) > new Date();
-
   return (
     <Layout>
       <HeroSection
@@ -75,44 +70,9 @@ const EventsPage = () => {
 
       <section className="section-padding">
         <div className="container mx-auto">
-          <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
-            <EventFilters onFilterChange={handleFilterChange} />
-          </div>
-
-          {/* Live Event Banner (if available) */}
-          {liveEvent && isLiveEventSoon && (
-            <div className="mb-8 bg-gradient-to-r from-red-600 to-pink-600 rounded-lg p-4 shadow-lg">
-              <div className="flex flex-wrap items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <div className="absolute -top-1 -left-1">
-                      <Badge variant="destructive" className="animate-pulse flex gap-1 items-center">
-                        <span className="h-2 w-2 rounded-full bg-white"></span>
-                        LIVE
-                      </Badge>
-                    </div>
-                    <img 
-                      src={liveEvent.image} 
-                      alt={liveEvent.title} 
-                      className="h-16 w-16 rounded object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-white text-lg font-bold">{liveEvent.title}</h3>
-                    <p className="text-white/80 text-sm flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> Starting soon
-                    </p>
-                  </div>
-                </div>
-                <Button 
-                  className="bg-white text-red-600 hover:bg-gray-100"
-                  onClick={() => window.location.href = `/live/${liveEvent.id}`}
-                >
-                  Join Now
-                </Button>
-              </div>
-            </div>
-          )}
+          <LiveEventTape />
+          
+          <EventFilters onFilterChange={handleFilterChange} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {currentEvents.length > 0 ? (

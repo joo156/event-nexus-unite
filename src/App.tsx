@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -45,17 +44,16 @@ const AppContent = () => {
     const liveEventAdded = localStorage.getItem("live_event_added");
     
     if (!liveEventAdded) {
-      // Add a live event that will start 1 minute after the homepage is loaded
+      // Add a live event that will start immediately
       const currentDate = new Date();
-      const liveEventStartTime = new Date(currentDate.getTime() + 60000); // 1 minute from now
       
       // Format time to "10:30 AM" format
       const timeOptions: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-digit' };
-      const formattedTime = liveEventStartTime.toLocaleTimeString([], timeOptions);
+      const formattedTime = currentDate.toLocaleTimeString([], timeOptions);
       
       // Format date to "April 23, 2023" format
       const dateOptions: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' };
-      const formattedDate = liveEventStartTime.toLocaleDateString('en-US', dateOptions);
+      const formattedDate = currentDate.toLocaleDateString('en-US', dateOptions);
       
       // Store live event in localStorage
       const liveEvent = {
@@ -100,15 +98,13 @@ const AppContent = () => {
       localStorage.setItem("events", JSON.stringify(events));
       localStorage.setItem("live_event_added", "true");
       
-      // Set a timeout to send a notification when the event goes live
-      setTimeout(() => {
-        addNotification({
-          title: "Live Event Starting Now!",
-          message: "Live Demo Event is starting now! Join to participate.",
-          type: "update",
-          link: `/live/99999`
-        });
-      }, 60000); // Notification after 1 minute
+      // Immediately send a notification that the event is live now
+      addNotification({
+        title: "Live Event Starting Now!",
+        message: "Live Demo Event is live now! Join to participate.",
+        type: "update",
+        link: `/live/99999`
+      });
     }
   }, [addNotification]);
 

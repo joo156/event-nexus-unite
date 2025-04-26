@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useEvents } from "@/context/EventContext";
+import { Clock } from "lucide-react";
 
 const LiveEventTape = () => {
   const { events } = useEvents();
@@ -12,7 +13,7 @@ const LiveEventTape = () => {
   if (!liveEvent || !isLiveEventSoon) return null;
 
   return (
-    <div className="container mx-auto mt-6 mb-0">
+    <div className="container mx-auto mt-6 mb-6">
       <div className="bg-gradient-to-r from-red-600 to-pink-600 rounded-lg p-4 shadow-lg">
         <div className="flex flex-wrap items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -20,7 +21,7 @@ const LiveEventTape = () => {
               <div className="absolute -top-1 -left-1">
                 <Badge variant="destructive" className="animate-pulse flex gap-1 items-center">
                   <span className="h-2 w-2 rounded-full bg-white"></span>
-                  LIVE
+                  LIVE NOW
                 </Badge>
               </div>
               <img 
@@ -31,12 +32,14 @@ const LiveEventTape = () => {
             </div>
             <div>
               <h3 className="text-white text-lg font-bold">{liveEvent.title}</h3>
-              <p className="text-white/80 text-sm">Starting soon - Join now!</p>
+              <p className="text-white/80 text-sm flex items-center gap-1">
+                <Clock className="h-3 w-3" /> Live now - Join the event!
+              </p>
             </div>
           </div>
           <Link to={`/live/${liveEvent.id}`}>
-            <Button className="bg-white text-red-600 hover:bg-gray-100">
-              Join Live Event
+            <Button className="bg-white text-red-600 hover:bg-gray-100 font-medium">
+              Join Live Now
             </Button>
           </Link>
         </div>
